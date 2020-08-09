@@ -15,7 +15,10 @@
                     }
                     else
                     {
-                        sb.Append(", " + t.Naziv);
+                        if (!string.IsNullOrEmpty(t.Naziv))
+                        {
+                            sb.Append(", " + t.Naziv);
+                        }
                     }
                     i++;
                 }

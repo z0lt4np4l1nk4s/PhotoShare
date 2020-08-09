@@ -38,43 +38,50 @@ namespace PhotoShare.Controllers
         [HttpPost]
         public ActionResult Create(PhotoVideo photoVideo, string[] tags, string tag)
         {
-            List<string> text = new List<string>();
-            StringBuilder sb = new StringBuilder();
-            foreach(char c in tag)
+            if (tags == null && string.IsNullOrEmpty(tag))
             {
-                if (!char.IsDigit(c) && !char.IsLetter(c))
-                {
-                    if (sb.ToString() != "")
-                    {
-                        text.Add(sb.ToString());
-                    }
-                    sb.Clear();
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-            text.Add(sb.ToString());
-            photoVideo.Naziv = Path.GetFileNameWithoutExtension(photoVideo.PhotoVideoFile.FileName);
-            if (ImageExtensions.Contains(Path.GetExtension(photoVideo.PhotoVideoFile.FileName)))
-            {
-                photoVideo.isSlika = true;
+                return View(photoVideo);
             }
             else
             {
-                photoVideo.isSlika = false;
+                List<string> text = new List<string>();
+                StringBuilder sb = new StringBuilder();
+                foreach (char c in tag)
+                {
+                    if (!char.IsDigit(c) && !char.IsLetter(c))
+                    {
+                        if (sb.ToString() != "")
+                        {
+                            text.Add(sb.ToString());
+                        }
+                        sb.Clear();
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+                text.Add(sb.ToString());
+                photoVideo.Naziv = Path.GetFileNameWithoutExtension(photoVideo.PhotoVideoFile.FileName);
+                if (ImageExtensions.Contains(Path.GetExtension(photoVideo.PhotoVideoFile.FileName)))
+                {
+                    photoVideo.isSlika = true;
+                }
+                else
+                {
+                    photoVideo.isSlika = false;
+                }
+                string fileName = photoVideo.Naziv + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(photoVideo.PhotoVideoFile.FileName);
+                photoVideo.Path = "~/Files/" + fileName;
+                fileName = Path.Combine(Server.MapPath("~/Files/"), fileName);
+                photoVideo.PhotoVideoFile.SaveAs(fileName);
+                photoVideo.DatumObjave = DateTime.Now;
+                db.PhotoVideo.Add(photoVideo);
+                db.SaveChanges();
+                int id = db.PhotoVideo.Single(x => x.Path == photoVideo.Path).ID;
+                AddTagToPost(id, tags, text);
+                return RedirectToAction("Index", "Home");
             }
-            string fileName = photoVideo.Naziv + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(photoVideo.PhotoVideoFile.FileName);
-            photoVideo.Path = "~/Files/" + fileName;
-            fileName = Path.Combine(Server.MapPath("~/Files/"), fileName);
-            photoVideo.PhotoVideoFile.SaveAs(fileName);
-            photoVideo.DatumObjave = DateTime.Now;
-            db.PhotoVideo.Add(photoVideo);
-            db.SaveChanges();
-            int id = db.PhotoVideo.Single(x => x.Path == photoVideo.Path).ID;
-            AddTagToPost(id, tags, text);
-            return RedirectToAction("Index", "Home");
         }
 
         private void AddTagToPost(int id, string[] tags, List<string> list)
@@ -87,7 +94,7 @@ namespace PhotoShare.Controllers
                 {
                     foreach (string s in tags)
                     {
-                        photoVideoTag.Tag = db.Tag.Single(x => x.ID == int.Parse(s));
+                        photoVideoTag.Tag = db.Tag.Single(x => x.ID.ToString() == s);
                         db.PhotoVideoTag.Add(photoVideoTag);
                     }
                 }
