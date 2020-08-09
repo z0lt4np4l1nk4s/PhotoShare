@@ -1,0 +1,26 @@
+﻿@{ 
+    int i = 0;
+    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+    foreach(PhotoShare.Models.PhotoVideoTag pvt in ViewBag.PostTags)
+    {
+        if (Model.ID == pvt.PhotoVideoID)
+        {
+            foreach(PhotoShare.Models.Tag t in ViewBag.Tag)
+            {
+                if (pvt.TagID == t.ID)
+                {
+                    if (i == 0)
+                    {
+                        sb.Append(t.Naziv);
+                    }
+                    else
+                    {
+                        sb.Append(", " + t.Naziv);
+                    }
+                    i++;
+                }
+            }
+        }
+    }
+    <text>@sb.ToString()</text>
+}

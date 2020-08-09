@@ -1,0 +1,67 @@
+﻿@model IEnumerable<PhotoShare.Models.PhotoVideo>
+
+@{
+    ViewBag.Title = "Index";
+}
+<br />
+<h2>
+    @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
+</h2>
+<br />
+@using (Html.BeginForm())
+{
+    <input type="radio" name="searchBy" value="Tag" checked="checked" />
+    <text>Tag</text>
+    <input type="radio" name="searchBy" value="Naziv" />
+    <text>Naziv</text>
+    <input type="radio" name="searchBy" value="Datum" />
+    <text>Datum</text>
+    <br />
+    <input type="text" name="search" />
+    <input type="submit" value="Search" />
+    @Html.ActionLink("Clear filter", "Index")
+}
+<table class="table">
+    <tr>
+        <th style="text-align:center;vertical-align:middle;">
+
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            @Html.DisplayNameFor(model => model.Naziv)
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            @Html.DisplayNameFor(model => model.DatumObjave)
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            Tags
+        </th>
+        <th style="text-align:center;vertical-align:middle;"></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td style="text-align:center;vertical-align:middle;">
+                @if (!string.IsNullOrEmpty(item.Path))
+                {
+                    <img src="@Url.Content(item.Path)" alt="No photo" width="200" height="200" />
+                }
+            </td>
+            <td style="text-align:center;vertical-align:middle;">
+                @Html.DisplayFor(modelItem => item.Naziv)
+            </td>
+            <td style="text-align:center;vertical-align:middle;">
+                @Html.DisplayFor(modelItem => item.DatumObjave)
+            </td>
+            <td style="text-align:center;vertical-align:middle;">
+                @Html.Partial("_PostTags", item)
+            </td>
+            <td style="text-align:center;vertical-align:middle;">
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
+
+</table>

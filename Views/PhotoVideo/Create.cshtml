@@ -1,0 +1,53 @@
+﻿@model PhotoShare.Models.PhotoVideo
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Dodaj</h2>
+
+
+@using (Html.BeginForm("Create", "PhotoVideo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.Path, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" name="PhotoVideoFile" required="required" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Dodaj Tag", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="text" name="tag" required="required" />
+            </div>
+        </div>
+        @if (Session["Tag"] != null)
+        {
+            <div class="form-group">
+                @Html.Label("Odaberi Tag", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.ListBox("tags", Session["Tag"] as List<SelectListItem>, new { multiple = "multiple" })
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Objavi" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Povratak", "Index", "Home")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
