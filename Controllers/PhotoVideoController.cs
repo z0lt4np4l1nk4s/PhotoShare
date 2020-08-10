@@ -80,7 +80,15 @@ namespace PhotoShare.Controllers
                 db.SaveChanges();
                 int id = db.PhotoVideo.Single(x => x.Path == photoVideo.Path).ID;
                 AddTagToPost(id, tags, text);
-                return RedirectToAction("Index", "Home");
+                if (photoVideo.isSlika)
+                {
+                    return RedirectToAction("Slika", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Video", "Home");
+                }
+                
             }
         }
 
@@ -96,6 +104,7 @@ namespace PhotoShare.Controllers
                     {
                         photoVideoTag.Tag = db.Tag.Single(x => x.ID.ToString() == s);
                         db.PhotoVideoTag.Add(photoVideoTag);
+                        db.SaveChanges();
                     }
                 }
             }
@@ -103,10 +112,13 @@ namespace PhotoShare.Controllers
             {
                 if (db.Tag.Count(x => x.Naziv == s) == 0)
                 {
-                    db.Tag.Add(new Tag { Naziv = s});
-                    db.SaveChanges();
-                    photoVideoTag.Tag = db.Tag.Single(x => x.Naziv.ToLower() == s.ToLower());
-                    db.PhotoVideoTag.Add(photoVideoTag);
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        db.Tag.Add(new Tag { Naziv = s });
+                        db.SaveChanges();
+                        photoVideoTag.Tag = db.Tag.Single(x => x.Naziv.ToLower() == s.ToLower());
+                        db.PhotoVideoTag.Add(photoVideoTag);
+                    }
                 }
             }
             db.SaveChanges();

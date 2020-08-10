@@ -1,20 +1,29 @@
 ﻿@model IEnumerable<PhotoShare.Models.PhotoVideo>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Video";
 }
-
-<h2>Zadnjih 5 objava</h2>
-
-<h4>
+<h2>
     @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
-</h4>
+</h2>
+<br />
+@using (Html.BeginForm())
+{
+    <input type="radio" name="searchBy" value="Tag" checked="checked" />
+    <text>Tag</text>
+    <input type="radio" name="searchBy" value="Naziv" />
+    <text>Naziv</text>
+    <br />
+    <input type="text" name="search" />
+    <input type="submit" value="Search" />
+    @Html.ActionLink("Clear filter", "Index")
+}
 <table class="table">
     <tr>
         <th style="text-align:center;vertical-align:middle;">
 
         </th>
-        <th></th>
+        <th style="text-align:center;vertical-align:middle;"></th>
         <th style="text-align:center;vertical-align:middle;">
             @Html.DisplayNameFor(model => model.Naziv)
         </th>
@@ -38,38 +47,25 @@
     {
         foreach (var item in Model)
         {
-            <tr>
-                <td style="text-align:center;vertical-align:middle;width:255px;height:240px;">
-                    @if (item.isSlika)
+            <tr style="height:240px">
+                <td style="text-align:center;vertical-align:middle;width:255px;height:240px">
+                    @if (!string.IsNullOrEmpty(item.Path))
                     {
-                        if (!string.IsNullOrEmpty(item.Path))
-                        {
-                            <img src="@Url.Content(item.Path)" alt="No photo" width="250" height="235" />
-                        }
+                        <div class="video">
+                            <video width="250" height="230" loop preload="metadata">
+                                <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(item.Path))">
+                            </video>
+                        </div>
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(item.Path))
-                        {
-                            <div class="video">
-                                <video width="250" height="230" loop preload="metadata">
-                                    <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(item.Path))">
-                                </video>
-                            </div>
-                        }
-                        else
-                        {
-                            <img src="~/Files/video-camera-icon.png" width="250" height="235" />
-                        }
+                        <img src="~/Files/video-camera-icon.png" width="250" height="235" />
                     }
                 </td>
                 <td style="text-align:center;vertical-align:middle;">
-                    @if (!item.isSlika)
+                    @if (!string.IsNullOrEmpty(item.Path))
                     {
-                        if (!string.IsNullOrEmpty(item.Path))
-                        {
-                            <input type="button" value="Open" onclick="window.open('@Url.Content(item.Path)', '_blank')" />
-                        }
+                        <input type="button" value="Open" onclick="window.open('@Url.Content(item.Path)', '_blank')" />
                     }
                 </td>
                 <td style="text-align:center;vertical-align:middle;">
