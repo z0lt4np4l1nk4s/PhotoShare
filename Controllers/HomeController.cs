@@ -1,10 +1,12 @@
-﻿using PhotoShare.Models;
+﻿using PagedList;
+using PhotoShare.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace PhotoShare.Controllers
 {
@@ -20,68 +22,60 @@ namespace PhotoShare.Controllers
             return View(items.ToList());
         }
 
-        public ActionResult Slika()
+        public ActionResult Slika(string search, string searchBy, int? page)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
             ViewBag.Tag = db.Tag;
-            return View(db.PhotoVideo.Where(x => x.isSlika == true).ToList());
-        }
-
-        [HttpPost]
-        public ActionResult Slika(string search, string searchBy)
-        {
-            ViewBag.PostTags = db.PhotoVideoTag;
-            ViewBag.Tag = db.Tag;
-            List<PhotoVideo> slikaList = new List<PhotoVideo>();
-            switch(searchBy)
+            var slikaList = db.PhotoVideo.Where(x => x.isSlika == true).ToList().AsQueryable();
+            if (!string.IsNullOrEmpty(search))
             {
-                case "Tag":
-                    foreach (PhotoVideoTag photoVideoTag in db.PhotoVideoTag)
-                    {
-                        if(db.Tag.Single(x => x.ID == photoVideoTag.TagID).Naziv.ToLower().StartsWith(search))
+                switch (searchBy)
+                {
+                    case "Tag":
+                        List<PhotoVideo> list = new List<PhotoVideo>();
+                        foreach (PhotoVideoTag photoVideoTag in db.PhotoVideoTag)
                         {
-                            slikaList.Add(db.PhotoVideo.Single(x => x.ID == photoVideoTag.PhotoVideoID));
+                            if (db.Tag.Single(x => x.ID == photoVideoTag.TagID).Naziv.ToLower().StartsWith(search))
+                            {
+                                list.Add(db.PhotoVideo.Single(x => x.ID == photoVideoTag.PhotoVideoID));
+                            }
                         }
-                    }
-                    break;
-                case "Datum":
-                    break;
-                default:
-                    slikaList = db.PhotoVideo.Where(x => x.Naziv.ToLower().StartsWith(search.ToLower())).ToList();
-                    break;
+                        slikaList = list.Where(x => x.isSlika == true).AsQueryable();
+                        break;
+                    default:
+                        slikaList = slikaList.Where(x => x.Naziv.ToLower().StartsWith(search.ToLower()) && x.isSlika == true);
+                        break;
+                }
             }
-            return View(slikaList);
+            return View(slikaList.ToPagedList(page ?? 1, 5));
         }
 
-        public ActionResult Video()
+        public ActionResult Video(string search, string searchBy, int? page)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
             ViewBag.Tag = db.Tag;
-            return View(db.PhotoVideo.Where(x => x.isSlika == false).ToList());
-        }
-
-        [HttpPost]
-        public ActionResult Video(string search, string searchBy)
-        {
-            ViewBag.PostTags = db.PhotoVideoTag;
-            ViewBag.Tag = db.Tag;
-            List<PhotoVideo> videoList = new List<PhotoVideo>();
-            switch (searchBy)
+            var videoList = db.PhotoVideo.Where(x => x.isSlika == false).ToList().AsQueryable();
+            if (!string.IsNullOrEmpty(search))
             {
-                case "Tag":
-                    foreach (PhotoVideoTag photoVideoTag in db.PhotoVideoTag)
-                    {
-                        if (db.Tag.Single(x => x.ID == photoVideoTag.TagID).Naziv.ToLower().StartsWith(search))
+                switch (searchBy)
+                {
+                    case "Tag":
+                        List<PhotoVideo> list = new List<PhotoVideo>();
+                        foreach (PhotoVideoTag photoVideoTag in db.PhotoVideoTag)
                         {
-                            videoList.Add(db.PhotoVideo.Single(x => x.ID == photoVideoTag.PhotoVideoID));
+                            if (db.Tag.Single(x => x.ID == photoVideoTag.TagID).Naziv.ToLower().StartsWith(search))
+                            {
+                                list.Add(db.PhotoVideo.Single(x => x.ID == photoVideoTag.PhotoVideoID));
+                            }
                         }
-                    }
-                    break;
-                default:
-                    videoList = db.PhotoVideo.Where(x => x.Naziv.ToLower().StartsWith(search.ToLower())).ToList();
-                    break;
+                        videoList = list.Where(x => x.isSlika == false).AsQueryable();
+                        break;
+                    default:
+                        videoList = videoList.Where(x => x.Naziv.ToLower().StartsWith(search.ToLower()) && x.isSlika == false).ToList().AsQueryable();
+                        break;
+                }
             }
-            return View(videoList);
+            return View(videoList.ToPagedList(page ?? 1, 5));
         }
     }
 }

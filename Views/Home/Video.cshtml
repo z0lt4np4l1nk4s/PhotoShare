@@ -1,4 +1,6 @@
-﻿@model IEnumerable<PhotoShare.Models.PhotoVideo>
+﻿@using PagedList;
+@using PagedList.Mvc;
+@model IPagedList<PhotoShare.Models.PhotoVideo>
 
 @{
     ViewBag.Title = "Video";
@@ -10,12 +12,36 @@
     </h2>
 }
 <br />
-@using (Html.BeginForm())
+@using (Html.BeginForm("Video", "Home", FormMethod.Get, new { page = Request.QueryString["page"], search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"] }))
 {
-    <input type="radio" name="searchBy" value="Tag" checked="checked" />
-    <text>Tag</text>
-    <input type="radio" name="searchBy" value="Naziv" />
-    <text>Naziv</text>
+    if (!string.IsNullOrEmpty(Request.QueryString["searchBy"]))
+    {
+        if (Request.QueryString["searchBy"] == "Tag")
+        {
+            <input type="radio" name="searchBy" value="Tag" checked="checked" />
+        }
+        else
+        {
+            <input type="radio" name="searchBy" value="Tag" />
+        }
+        <text>Tag</text>
+        if (Request.QueryString["searchBy"] == "Naziv")
+        {
+            <input type="radio" name="searchBy" value="Naziv" checked="checked" />
+        }
+        else
+        {
+            <input type="radio" name="searchBy" value="Naziv" />
+        }
+        <text>Naziv</text>
+    }
+    else
+    {
+        <input type="radio" name="searchBy" value="Tag" checked="checked" />
+        <text>Tag</text>
+        <input type="radio" name="searchBy" value="Naziv" />
+        <text>Naziv</text>
+    }
     <br />
     <input type="text" name="search" />
     <input type="submit" value="Pretraži" />
@@ -28,10 +54,10 @@
         </th>
         <th style="text-align:center;vertical-align:middle;"></th>
         <th style="text-align:center;vertical-align:middle;">
-            @Html.DisplayNameFor(model => model.Naziv)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Naziv)
         </th>
         <th style="text-align:center;vertical-align:middle;">
-            @Html.DisplayNameFor(model => model.DatumObjave)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DatumObjave)
         </th>
         <th style="text-align:center;vertical-align:middle;">
             Tagovi
@@ -89,6 +115,9 @@
     }
 
 </table>
+<div style="text-align:center">
+    @Html.PagedListPager(Model, page => Url.Action("Video", new { page, search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"] }), new PagedListRenderOptions { Display = PagedListDisplayMode.IfNeeded })
+</div>
 
 <script type="text/javascript" language="javascript">
     var figure = $(".video").hover(hoverVideo, hideVideo);
