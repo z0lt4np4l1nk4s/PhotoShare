@@ -1,0 +1,78 @@
+﻿@model PhotoShare.Models.PhotoVideo
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Jeste li sigurni da želite obrisati '@Model.Naziv'?</h2>
+
+<div>
+    <hr />
+    @if (Model.isSlika)
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <img src="@Url.Content(Model.Path)" alt="No photo" style="max-width:600px;max-height:400px" />
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <div class="video">
+                <video loop preload="metadata" style="max-width:600px;max-height:400px">
+                    <source src="@Url.Content(Model.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(Model.Path))">
+                </video>
+            </div>
+        }
+        else
+        {
+            <img src="~/Files/video-camera-icon.png" width="250" height="235" />
+        }
+    }
+    <br />
+    <br />
+    <div style="font-size:medium">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Naziv)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Naziv)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.DatumObjave)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.DatumObjave)
+            </dd>
+            <dt>
+                Tagovi
+            </dt>
+            <dd>
+                @Html.Partial("_PostTags", Model)
+            </dd>
+
+        </dl>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+    <div class="form-actions no-color">
+        <input type="submit" value="Obriši" class="btn btn-default" /> |
+        @if (Model.isSlika)
+        {
+            @Html.ActionLink("Povratak", "Slika", "Home")
+        }
+        else
+        {
+            @Html.ActionLink("Povratak", "Video", "Home")
+        }
+    </div>
+        }
+    </div>
+</div>

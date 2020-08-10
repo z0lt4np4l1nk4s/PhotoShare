@@ -1,0 +1,91 @@
+﻿@model PhotoShare.Models.PhotoVideo
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Uredi '@Model.Naziv'</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ID)
+    @if (Model.isSlika)
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <img src="@Url.Content(Model.Path)" alt="No photo" style="max-width:600px;max-height:400px" />
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <div class="video">
+                <video loop preload="metadata" style="max-width:600px;max-height:400px">
+                    <source src="@Url.Content(Model.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(Model.Path))">
+                </video>
+            </div>
+        }
+        else
+        {
+            <img src="~/Files/video-camera-icon.png" width="250" height="235" />
+        }
+    }
+    <br />
+    <br />
+
+    <div class="form-group">
+        @Html.Label("Unesite novi tag", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="text" name="tag" />
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.Label("Odaberite tag", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="checkbox">
+                @Html.ListBox("tags", Session["Tag"] as List<SelectListItem>, new { multiple = "multiple" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Spremi" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @if (Model.isSlika)
+    {
+        @Html.ActionLink("Povratak", "Slika", "Home")
+    }
+    else
+    {
+        @Html.ActionLink("Povratak", "Video", "Home")
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript" language="javascript">
+    var figure = $(".video").hover(hoverVideo, hideVideo);
+
+    function hoverVideo(e) {
+        $('video', this).get(0).play();
+    }
+
+    function hideVideo(e) {
+        $('video', this).get(0).pause();
+    }
+</script>

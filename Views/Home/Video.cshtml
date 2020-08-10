@@ -3,9 +3,12 @@
 @{
     ViewBag.Title = "Video";
 }
-<h2>
-    @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
-</h2>
+@if (Request.IsAuthenticated)
+{
+    <h2>
+        @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
+    </h2>
+}
 <br />
 @using (Html.BeginForm())
 {
@@ -15,13 +18,13 @@
     <text>Naziv</text>
     <br />
     <input type="text" name="search" />
-    <input type="submit" value="Search" />
-    @Html.ActionLink("Clear filter", "Index")
+    <input type="submit" value="Pretraži" />
+    @Html.ActionLink("Obriši filter", "Video")
 }
 <table class="table">
     <tr>
         <th style="text-align:center;vertical-align:middle;">
-
+            Video
         </th>
         <th style="text-align:center;vertical-align:middle;"></th>
         <th style="text-align:center;vertical-align:middle;">
@@ -31,14 +34,17 @@
             @Html.DisplayNameFor(model => model.DatumObjave)
         </th>
         <th style="text-align:center;vertical-align:middle;">
-            Tags
+            Tagovi
         </th>
-        <th style="text-align:center;vertical-align:middle;"></th>
+        @if (Request.IsAuthenticated)
+        {
+            <th style="text-align:center;vertical-align:middle;width:60px"></th>
+        }
     </tr>
     @if (Model.Count() == 0)
     {
         <tr>
-            <td colspan="4">
+            <td colspan="5" style="text-align:center;vertical-align:middle;">
                 Nema rezultata
             </td>
         </tr>
@@ -48,24 +54,17 @@
         foreach (var item in Model)
         {
             <tr style="height:240px">
-                <td style="text-align:center;vertical-align:middle;width:255px;height:240px">
-                    @if (!string.IsNullOrEmpty(item.Path))
-                    {
-                        <div class="video">
-                            <video width="250" height="230" loop preload="metadata">
-                                <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(item.Path))">
-                            </video>
-                        </div>
-                    }
-                    else
-                    {
-                        <img src="~/Files/video-camera-icon.png" width="250" height="235" />
-                    }
+                <td style="text-align:center;vertical-align:middle;width:250px;height:250px">
+                    <div class="video">
+                        <video style="max-width:250px;max-height:250px;" loop preload="metadata">
+                            <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(item.Path))">
+                        </video>
+                    </div>
                 </td>
                 <td style="text-align:center;vertical-align:middle;">
                     @if (!string.IsNullOrEmpty(item.Path))
                     {
-                        <input type="button" value="Open" onclick="window.open('@Url.Content(item.Path)', '_blank')" />
+                        <input type="button" value="Otvori" onclick="window.open('@Url.Content(item.Path)', '_blank')" />
                     }
                 </td>
                 <td style="text-align:center;vertical-align:middle;">
@@ -77,11 +76,14 @@
                 <td style="text-align:center;vertical-align:middle;">
                     @Html.Partial("_PostTags", item)
                 </td>
-                <td style="text-align:center;vertical-align:middle;">
-                    @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.ID }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.ID })
-                </td>
+                @if (Request.IsAuthenticated)
+                {
+                    <td style="text-align:center;vertical-align:middle;">
+                        @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
+                    </td>
+                }
             </tr>
         }
     }

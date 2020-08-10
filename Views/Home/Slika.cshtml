@@ -3,74 +3,81 @@
 @{
     ViewBag.Title = "Index";
 }
-<h2>
-    @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
-</h2>
+@if (Request.IsAuthenticated)
+{
+    <h2>
+        @Html.ActionLink("Dodaj", "Create", "PhotoVideo")
+    </h2>
+}
+<br />
+@using (Html.BeginForm())
+{
+    <input type="radio" name="searchBy" value="Tag" checked="checked" />
+    <text>Tag</text>
+    <input type="radio" name="searchBy" value="Naziv" />
+    <text>Naziv</text>
     <br />
-    @using (Html.BeginForm())
+    <input type="text" name="search" />
+    <input type="submit" value="Pretraži" />
+    @Html.ActionLink("Obriši filter", "Slika")
+}
+<table class="table">
+    <tr>
+        <th style="text-align:center;vertical-align:middle;">
+            Slika
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            @Html.DisplayNameFor(model => model.Naziv)
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            @Html.DisplayNameFor(model => model.DatumObjave)
+        </th>
+        <th style="text-align:center;vertical-align:middle;">
+            Tagovi
+        </th>
+        @if (Request.IsAuthenticated)
+        {
+            <th style="text-align:center;vertical-align:middle;width:60px;"></th>
+        }
+    </tr>
+    @if (Model.Count() == 0)
     {
-        <input type="radio" name="searchBy" value="Tag" checked="checked" />
-        <text>Tag</text>
-        <input type="radio" name="searchBy" value="Naziv" />
-        <text>Naziv</text>
-        <input type="radio" name="searchBy" value="Datum" />
-        <text>Datum</text>
-        <br />
-        <input type="text" name="search" />
-        <input type="submit" value="Search" />
-        @Html.ActionLink("Clear filter", "Index")
-    }
-    <table class="table">
         <tr>
-            <th style="text-align:center;vertical-align:middle;">
-
-            </th>
-            <th style="text-align:center;vertical-align:middle;">
-                @Html.DisplayNameFor(model => model.Naziv)
-            </th>
-            <th style="text-align:center;vertical-align:middle;">
-                @Html.DisplayNameFor(model => model.DatumObjave)
-            </th>
-            <th style="text-align:center;vertical-align:middle;">
-                Tags
-            </th>
-            <th style="text-align:center;vertical-align:middle;"></th>
+            <td colspan="4" style="text-align:center;vertical-align:middle;">
+                Nema rezultata
+            </td>
         </tr>
-        @if (Model.Count() == 0)
+    }
+    else
+    {
+        foreach (var item in Model)
         {
             <tr>
-                <td colspan="4">
-                    Nema rezultata
+                <td style="text-align:center;vertical-align:middle;">
+                    @if (!string.IsNullOrEmpty(item.Path))
+                    {
+                        <img src="@Url.Content(item.Path)" alt="No photo" style="max-width:250px;max-height:250px;" />
+                    }
                 </td>
+                <td style="text-align:center;vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Naziv)
+                </td>
+                <td style="text-align:center;vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.DatumObjave)
+                </td>
+                <td style="text-align:center;vertical-align:middle;">
+                    @Html.Partial("_PostTags", item)
+                </td>
+                @if (Request.IsAuthenticated)
+                {
+                    <td style="text-align:center;vertical-align:middle;">
+                        @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
+                    </td>
+                }
             </tr>
         }
-        else
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td style="text-align:center;vertical-align:middle;">
-                        @if (!string.IsNullOrEmpty(item.Path))
-                        {
-                            <img src="@Url.Content(item.Path)" alt="No photo" width="200" height="200" />
-                        }
-                    </td>
-                    <td style="text-align:center;vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.Naziv)
-                    </td>
-                    <td style="text-align:center;vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.DatumObjave)
-                    </td>
-                    <td style="text-align:center;vertical-align:middle;">
-                        @Html.Partial("_PostTags", item)
-                    </td>
-                    <td style="text-align:center;vertical-align:middle;">
-                        @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.ID }) |
-                        @Html.ActionLink("Delete", "Delete", new { id = item.ID })
-                    </td>
-                </tr>
-            }
-        }
+    }
 
-    </table>
+</table>

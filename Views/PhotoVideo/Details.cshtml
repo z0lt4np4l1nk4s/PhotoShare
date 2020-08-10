@@ -1,0 +1,83 @@
+﻿@model PhotoShare.Models.PhotoVideo
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Detalji '@Model.Naziv'</h2>
+
+<div>
+    <hr />
+    @if (Model.isSlika)
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <img src="@Url.Content(Model.Path)" alt="No photo" style="max-width:600px;max-height:400px"/>
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.Path))
+        {
+            <div class="video">
+                <video loop preload="metadata" style="max-width:600px;max-height:400px">
+                    <source src="@Url.Content(Model.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(Model.Path))">
+                </video>
+            </div>
+        }
+        else
+        {
+            <img src="~/Files/video-camera-icon.png" width="250" height="235" />
+        }
+    }
+    <br />
+    <br />
+    <div style="font-size:medium">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Naziv)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Naziv)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.DatumObjave)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.DatumObjave)
+            </dd>
+            <dt>
+                Tagovi
+            </dt>
+            <dd>
+                @Html.Partial("_PostTags", Model)
+            </dd>
+        </dl>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = Model.ID }, null) |
+    @if (Model.isSlika)
+    {
+        @Html.ActionLink("Povratak", "Slika", "Home")
+    }
+    else
+    {
+        @Html.ActionLink("Povratak", "Video", "Home")
+    }
+</p>
+
+<script type="text/javascript" language="javascript">
+    var figure = $(".video").hover(hoverVideo, hideVideo);
+
+    function hoverVideo(e) {
+        $('video', this).get(0).play();
+    }
+
+    function hideVideo(e) {
+        $('video', this).get(0).pause();
+    }
+</script>
