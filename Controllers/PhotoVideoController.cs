@@ -16,7 +16,7 @@ namespace PhotoShare.Controllers
         PhotoVideoDBContext db = new PhotoVideoDBContext();
         bool isEdit = false;
         // GET: PhotoVideo
-        
+
         public ActionResult Create()
         {
             isEdit = false;
@@ -91,7 +91,7 @@ namespace PhotoShare.Controllers
                 {
                     return RedirectToAction("Video", "Home");
                 }
-                
+
             }
         }
 
@@ -134,7 +134,7 @@ namespace PhotoShare.Controllers
                     }
                 }
             }
-            foreach(string s in list)
+            foreach (string s in list)
             {
                 if (db.Tag.Count(x => x.Naziv == s) == 0)
                 {
@@ -145,6 +145,12 @@ namespace PhotoShare.Controllers
                         photoVideoTag.Tag = db.Tag.Single(x => x.Naziv.ToLower() == s.ToLower());
                         db.PhotoVideoTag.Add(photoVideoTag);
                     }
+                }
+                else
+                {
+                    photoVideoTag.Tag = db.Tag.Single(x => x.Naziv == s);
+                    db.PhotoVideoTag.Add(photoVideoTag);
+                    db.SaveChanges();
                 }
             }
             db.SaveChanges();

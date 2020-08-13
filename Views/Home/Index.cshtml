@@ -28,7 +28,7 @@
         </th>
         @if (Request.IsAuthenticated)
         {
-            <th style="text-align:center;vertical-align:middle;width:60px"></th>
+            <th class="actions-col"></th>
         }
     </tr>
     @if (Model.Count() == 0)
@@ -43,31 +43,33 @@
     {
         foreach (var item in Model)
         {
-            <tr>
-                <td style="text-align:center;vertical-align:middle;width:250px;height:250px;">
-                    @if (item.isSlika)
-                    {
-                        if (!string.IsNullOrEmpty(item.Path))
+            <tr class="tablerow">
+                @if (item.isSlika)
+                {
+                    <td class="image-holder-list" style="vertical-align: middle;">
+                        @if (!string.IsNullOrEmpty(item.Path))
                         {
-                            <img src="@Url.Content(item.Path)" alt="No photo" style="max-width:250px;max-height:250px;"/>
+                            <img src="@Url.Content(item.Path)" alt="No photo" class="image" />
                         }
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(item.Path))
+                    </td>
+                }
+                else
+                {
+                    <td class="video-holder" style="vertical-align: middle;">
+                        @if (!string.IsNullOrEmpty(item.Path))
                         {
                             <div class="video">
-                                <video style="max-height:250px;max-width:250px;" loop preload="metadata">
-                                    <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(System.IO.Path.GetExtension(item.Path))">
+                                <video class="videostyle" loop preload="metadata">
+                                    <source src="@Url.Content(item.Path)" type="@PhotoShare.Common.MimeTypes.GetMimeType(item.Path)">
                                 </video>
                             </div>
                         }
                         else
                         {
-                            <img src="~/Files/video-camera-icon.png" style="max-height:250px;max-width:250px" />
+                            <img src="~/Files/video-camera-icon.png" class="image" />
                         }
-                    }
-                </td>
+                    </td>
+                }
                 <td style="text-align:center;vertical-align:middle;">
                     @if (!item.isSlika)
                     {
@@ -88,11 +90,11 @@
                 </td>
                 @if (Request.IsAuthenticated)
                 {
-            <td style="text-align:center;vertical-align:middle;">
-                @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
-                @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
-                @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
-            </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
+                        @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
+                    </td>
                 }
             </tr>
         }

@@ -12,7 +12,7 @@
     </h2>
 }
 <br />
-@using (Html.BeginForm("Slika", "Home", FormMethod.Get, new { page = Request.QueryString["page"], search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"] }))
+@using (Html.BeginForm("Slika", "Home", new { page = Request.QueryString["page"], search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"], view = Request.QueryString["view"]}, FormMethod.Get))
 {
     if (!string.IsNullOrEmpty(Request.QueryString["searchBy"]))
     {
@@ -45,68 +45,120 @@
     <br />
     <input type="text" name="search" />
     <input type="submit" value="Pretraži" />
-    @Html.ActionLink("Obriši filter", "Slika")
-}
-<table class="table">
-    <tr>
-        <th style="text-align:center;vertical-align:middle;">
-            Slika
-        </th>
-        <th style="text-align:center;vertical-align:middle;">
-            @Html.DisplayNameFor(model => model.FirstOrDefault().Naziv)
-        </th>
-        <th style="text-align:center;vertical-align:middle;">
-            @Html.DisplayNameFor(model => model.FirstOrDefault().DatumObjave)
-        </th>
-        <th style="text-align:center;vertical-align:middle;">
-            Tagovi
-        </th>
-        @if (Request.IsAuthenticated)
-        {
-            <th style="text-align:center;vertical-align:middle;width:60px;"></th>
-        }
-    </tr>
-    @if (Model.Count() == 0)
+    @Html.ActionLink("Obriši filter", "Slika", new { view = Request.QueryString["view"] })
+    if (Request.QueryString["view"] == "grid")
     {
-        <tr>
-            <td colspan="4" style="text-align:center;vertical-align:middle;">
-                Nema rezultata
-            </td>
-        </tr>
+        <input type="submit" name="view" value="list" class="list-view" />
     }
     else
     {
-        foreach (var item in Model)
+        <input type="submit" name="view" value="grid" class="grid-view" />
+    }
+}
+<br />
+@if (Request.QueryString["view"] == "grid")
+{
+    <div class="parent">
+        @if (Model.Count() == 0)
+        {
+            <div class="child">
+                Nema rezultata
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="child">
+                    <div class="image-holder-grid">
+                        <img src="@Url.Content(item.Path)" class="image" alt="No photo" />
+                    </div>
+                    <br />
+
+                    <div class="text">
+                        <b>
+                            @Html.DisplayFor(modelItem => item.Naziv)
+                            <br />
+                            @Html.DisplayFor(modelItem => item.DatumObjave)
+                            <br />
+                            @Html.Partial("_PostTags", item)
+                        </b>
+                    </div>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <div style="text-align: center; vertical-align: middle;">
+                            @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null) |
+                            @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null) |
+                            @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th style="text-align: center; vertical-align: middle;">
+                Slika
+            </th>
+            <th style="text-align: center; vertical-align: middle;">
+                @Html.ActionLink("Naziv", "Slika", new { view = Request.QueryString["view"], page = Request.QueryString["page"], search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"], sortBy = ViewBag.Naziv })
+            </th>
+            <th style="text-align: center; vertical-align: middle;">
+                @Html.ActionLink("Vrijeme objave", "Slika", new { view = Request.QueryString["view"], page = Request.QueryString["page"], search = Request.QueryString["search"], searchBy = Request.QueryString["searchBy"], sortBy = ViewBag.Datum })
+            </th>
+            <th style="text-align: center; vertical-align: middle;">
+                Tagovi
+            </th>
+            @if (Request.IsAuthenticated)
+            {
+                <th class="actions-col"></th>
+            }
+        </tr>
+        @if (Model.Count() == 0)
         {
             <tr>
-                <td style="text-align:center;vertical-align:middle;">
-                    @if (!string.IsNullOrEmpty(item.Path))
-                    {
-                        <img src="@Url.Content(item.Path)" alt="No photo" style="max-width:250px;max-height:250px;" />
-                    }
+                <td colspan="4" style="text-align: center; vertical-align: middle;">
+                    Nema rezultata
                 </td>
-                <td style="text-align:center;vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Naziv)
-                </td>
-                <td style="text-align:center;vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.DatumObjave)
-                </td>
-                <td style="text-align:center;vertical-align:middle;">
-                    @Html.Partial("_PostTags", item)
-                </td>
-                @if (Request.IsAuthenticated)
-                {
-                    <td style="text-align:center;vertical-align:middle;">
-                        @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
-                        @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
-                        @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
-                    </td>
-                }
             </tr>
         }
-    }
-
-</table>
-<div style="text-align:center">
-    @Html.PagedListPager(Model, page => Url.Action("Slika", new { page, search = Request.QueryString["search"] }), new PagedListRenderOptions { Display = PagedListDisplayMode.IfNeeded })
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td class="image-holder-list" style="vertical-align: middle;">
+                        @if (!string.IsNullOrEmpty(item.Path))
+                        {
+                            <img src="@Url.Content(item.Path)" alt="No photo" class="image" />
+                        }
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        @Html.DisplayFor(modelItem => item.Naziv)
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        @Html.DisplayFor(modelItem => item.DatumObjave)
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        @Html.Partial("_PostTags", item)
+                    </td>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <td style="text-align: center; vertical-align: middle;">
+                            @Html.ActionLink("Uredi", "Edit", "PhotoVideo", new { id = item.ID }, null)
+                            @Html.ActionLink("Detalji", "Details", "PhotoVideo", new { id = item.ID }, null)
+                            @Html.ActionLink("Obriši", "Delete", "PhotoVideo", new { id = item.ID }, null)
+                        </td>
+                    }
+                </tr>
+            }
+        }
+    </table>
+}
+<div class="pager">
+    @Html.PagedListPager(Model, page => Url.Action("Slika", new { view = Request.QueryString["view"], page, search = Request.QueryString["search"] }), new PagedListRenderOptions { Display = PagedListDisplayMode.IfNeeded })
 </div>

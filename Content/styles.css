@@ -1,0 +1,86 @@
+﻿.parent{
+    display:flex;
+    flex-wrap:wrap;
+    width:1128px;
+    text-align:center;
+}
+.child {
+    margin: 1px;
+    height: 320px;
+    width: 280px;
+    text-align: center;
+    overflow-wrap: break-word;
+    border: solid;
+    background-color: whitesmoke;
+}
+.videostyle{
+    max-height:180px;
+    max-width:270px;
+}
+.gridvideo {
+    margin-top:2px;
+    margin-bottom:2px;
+    height: 180px;
+}
+.text{
+    height:85px;
+}
+.actions{
+    vertical-align:bottom;
+    text-align:center;
+}
+.image{
+    max-width:270px;
+    max-height:180px;
+}
+.image-list {
+    max-width: 180px;
+    max-height: 200px;
+}
+.image-holder-grid{
+    margin-top:2px;
+    width:270px;
+    height:180px;
+}
+.image-holder-list {
+    width:200px;
+    height:200px;
+    text-align:center;
+}
+.listbox{
+    width:150px;
+}
+.pager{
+    text-align:center;
+}
+.tablerow {
+    height:240px;
+}
+.video-holder {
+    text-align: center;
+    vertical-align: middle;
+    width: 250px;
+    height: 250px
+}
+.actions-col {
+    text-align: center;
+    vertical-align: middle;
+    width: 60px;
+}
+.grid-view {
+    color: transparent;
+    font-size: 0px;
+    width: 36px;
+    height: 36px;
+    background-image: url('../Files/grid.png'); 
+    float:right;
+}
+.list-view {
+    color:transparent;
+    font-size:0px;
+    width:36px;
+    height:36px;
+    background-image:url('../Files/list.png');
+    float:right;
+}
+
