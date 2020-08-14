@@ -13,7 +13,7 @@ namespace PhotoShare.Controllers
     public class HomeController : Controller
     {
         PhotoVideoDBContext db = new PhotoVideoDBContext();
-
+        //public static string currentView="list";
         public ActionResult Index()
         {
             ViewBag.PostTags = db.PhotoVideoTag;
@@ -22,17 +22,18 @@ namespace PhotoShare.Controllers
             return View(items.ToList());
         }
 
-        public ActionResult Slika(string view, string search, string searchBy, int? page, string sortBy)
+        public ActionResult Slika(string view, string search, string searchBy, int? page, string sortBy, string viewChange)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
             ViewBag.Tag = db.Tag;
             ViewBag.Naziv = sortBy == "naziv" ? "naziv desc" : "naziv";
             ViewBag.Datum = sortBy == "stariji" ? "noviji" : "stariji";
-            if (!string.IsNullOrEmpty(view))
+            if (view == null) view = "grid";
+            if (viewChange != null)
             {
-                string v = view;
-                ViewBag.View = v;
+                ViewBag.view = viewChange == "list" ? "grid" : "list";
             }
+            else { ViewBag.view = view; }
             var slikaList = db.PhotoVideo.Where(x => x.isSlika == true).ToList().AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
@@ -79,20 +80,31 @@ namespace PhotoShare.Controllers
                     break;
 
             }
-            if (view == "grid")
+            if (ViewBag.view == "grid")
             {
                 return View(slikaList.ToPagedList(page ?? 1, 12));
             }
             return View(slikaList.ToPagedList(page ?? 1, 5));
         }
 
-        public ActionResult Video(string view, string search, string searchBy, int? page, string sortBy)
+        public ActionResult Video(string view, string search, string searchBy, int? page, string sortBy, string viewChange)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
             ViewBag.Tag = db.Tag;
             ViewBag.Naziv = sortBy == "naziv" ? "naziv desc" : "naziv";
             ViewBag.Datum = sortBy == "stariji" ? "noviji" : "stariji";
-            ViewBag.View = view == "list" ? "grid" : "list";
+            if (view == null)
+            {
+                view = "grid";
+            }
+            if (viewChange != null)
+            {
+                ViewBag.view = viewChange == "list" ? "grid" : "list"; 
+            }
+            else
+            {
+                ViewBag.view = view;
+            }
             var videoList = db.PhotoVideo.Where(x => x.isSlika == false).ToList().AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
@@ -134,7 +146,7 @@ namespace PhotoShare.Controllers
                     break;
 
             }
-            if (view == "grid")
+            if (ViewBag.view == "grid")
             {
                 return View(videoList.ToPagedList(page ?? 1, 12));
             }

@@ -14,6 +14,7 @@ namespace PhotoShare.Models
         public string Naziv { get; set; }
         [Display(Name = "Vrijeme objave")]
         public DateTime DatumObjave { get; set; }
+        [Display(Name = "Datoteka")]
         public string Path { get; set; }
         public bool isSlika { get; set; }
         [NotMapped]

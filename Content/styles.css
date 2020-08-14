@@ -17,6 +17,10 @@
     max-height:180px;
     max-width:270px;
 }
+.video-list{
+    max-height:270px;
+    max-width:270px;
+}
 .gridvideo {
     margin-top:2px;
     margin-bottom:2px;
@@ -70,16 +74,16 @@
 .grid-view {
     color: transparent;
     font-size: 0px;
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     background-image: url('../Files/grid.png'); 
     float:right;
 }
 .list-view {
     color:transparent;
     font-size:0px;
-    width:36px;
-    height:36px;
+    width:30px;
+    height:30px;
     background-image:url('../Files/list.png');
     float:right;
 }
