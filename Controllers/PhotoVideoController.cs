@@ -1,4 +1,5 @@
 ﻿using PhotoShare.Models;
+using PhotoShare.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,17 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Net.Http;
 
 namespace PhotoShare.Controllers
 {
-    [Authorize]
+    
     public class PhotoVideoController : Controller
     {
         List<string> ImageExtensions = new List<string> { ".jpg", ".jpe", ".bmp", ".gif", ".png", ".jpeg", ".jfif" };
         PhotoVideoDBContext db = new PhotoVideoDBContext();
+        string fName;
         bool isEdit = false;
-        // GET: PhotoVideo
 
+        [Authorize]
         public ActionResult Create()
         {
             isEdit = false;
@@ -55,9 +58,11 @@ namespace PhotoShare.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult Create(PhotoVideo photoVideo, string[] tags, string tag)
         {
+            /*
             if (tags == null && string.IsNullOrEmpty(tag))
             {
                 return View(photoVideo);
@@ -75,24 +80,30 @@ namespace PhotoShare.Controllers
                     photoVideo.isSlika = false;
                 }
                 string fileName = photoVideo.Naziv + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(photoVideo.PhotoVideoFile.FileName);
-                photoVideo.Path = "~/Files/" + fileName;
-                fileName = Path.Combine(Server.MapPath("~/Files/"), fileName);
-                photoVideo.PhotoVideoFile.SaveAs(fileName);
+                if (!string.IsNullOrEmpty(fName))
+                {
+                    photoVideo.Path = "~/Files/" + fName;
+                }
+                else
+                {
+                    photoVideo.Path = "~/Files/" + photoVideo.Naziv + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(photoVideo.PhotoVideoFile.FileName);
+                }
                 photoVideo.DatumObjave = DateTime.Now;
                 db.PhotoVideo.Add(photoVideo);
                 db.SaveChanges();
                 int id = db.PhotoVideo.Single(x => x.Path == photoVideo.Path).ID;
                 AddTagToPost(id, tags, text);
-                if (photoVideo.isSlika)
-                {
-                    return RedirectToAction("Slika", "Home");
-                }
-                else
-                {
-                    return RedirectToAction("Video", "Home");
-                }
-
+            */
+            if (photoVideo.isSlika)
+            {
+                return RedirectToAction("Slika", "Home");
             }
+            else
+            {
+                return RedirectToAction("Video", "Home");
+            }
+
+            //}
         }
 
         private List<string> GetTagsFromText(string tag)
@@ -140,7 +151,7 @@ namespace PhotoShare.Controllers
                 {
                     if (!string.IsNullOrEmpty(s))
                     {
-                        db.Tag.Add(new Tag { Naziv = s });
+                        db.Tag.Add(new Tag { Naziv = s.ToLower() });
                         db.SaveChanges();
                         photoVideoTag.Tag = db.Tag.Single(x => x.Naziv.ToLower() == s.ToLower());
                         db.PhotoVideoTag.Add(photoVideoTag);
@@ -161,6 +172,7 @@ namespace PhotoShare.Controllers
             db.PhotoVideoTag.RemoveRange(db.PhotoVideoTag.Where(x => x.PhotoVideoID == id));
         }
 
+        [Authorize]
         public ActionResult Details(int id)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
@@ -168,6 +180,7 @@ namespace PhotoShare.Controllers
             return View(db.PhotoVideo.Single(x => x.ID == id));
         }
 
+        [Authorize]
         public ActionResult Edit(int id)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
@@ -177,6 +190,7 @@ namespace PhotoShare.Controllers
             return View(db.PhotoVideo.Single(x => x.ID == id));
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult Edit(PhotoVideo photoVideo, string[] tags, string tag)
         {
@@ -200,6 +214,7 @@ namespace PhotoShare.Controllers
             }
         }
 
+        [Authorize]
         public ActionResult Delete(int id)
         {
             ViewBag.PostTags = db.PhotoVideoTag;
@@ -217,6 +232,7 @@ namespace PhotoShare.Controllers
             {
                 System.IO.File.Delete(Request.MapPath(photoVideo.Path));
             }
+            RemoveTagsFromPost(photoVideo.ID);
             db.PhotoVideo.Remove(photoVideo);
             db.SaveChanges();
             if (photoVideo.isSlika)
@@ -227,6 +243,46 @@ namespace PhotoShare.Controllers
             {
                 return RedirectToAction("Video", "Home");
             }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public HttpResponseMessage UploadFile()
+        {
+            foreach (string file in Request.Files)
+            {
+                var FileDataContent = Request.Files[file];
+                if (FileDataContent != null && FileDataContent.ContentLength > 0)
+                {
+                    // take the input stream, and save it to a temp folder using the original file.part name posted
+                    var stream = FileDataContent.InputStream;
+                    var fileName = Path.GetFileName(FileDataContent.FileName);
+                    var UploadPath = Server.MapPath("~/App_Data");
+                    Directory.CreateDirectory(UploadPath);
+                    string path = Path.Combine(UploadPath, fileName);
+                    try
+                    {
+                        if (System.IO.File.Exists(path))
+                            System.IO.File.Delete(path);
+                        using (var fileStream = System.IO.File.Create(path))
+                        {
+                            stream.CopyTo(fileStream);
+                        }
+                        // Once the file part is saved, see if we have enough to merge it
+                        Shared.Utils UT = new Shared.Utils();
+                        UT.MergeFile(path);
+                    }
+                    catch (IOException ex)
+                    {
+                        // handle
+                    }
+                }
+            }
+            return new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = new StringContent("File uploaded.")
+            };
         }
     }
 }

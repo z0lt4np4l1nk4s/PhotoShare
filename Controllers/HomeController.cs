@@ -13,7 +13,7 @@ namespace PhotoShare.Controllers
     public class HomeController : Controller
     {
         PhotoVideoDBContext db = new PhotoVideoDBContext();
-        //public static string currentView="list";
+        bool def = false;
         public ActionResult Index()
         {
             ViewBag.PostTags = db.PhotoVideoTag;
@@ -56,11 +56,6 @@ namespace PhotoShare.Controllers
                         break;
                 }
             }
-            else
-            {
-                search = null;
-                searchBy = null;
-            }
             switch (sortBy)
             {
                 case "naziv":
@@ -77,14 +72,16 @@ namespace PhotoShare.Controllers
                     break;
                 default:
                     slikaList = slikaList.OrderBy(x => x.ID).ToList().AsQueryable();
+                    def = true;
                     break;
 
             }
-            if (ViewBag.view == "grid")
+            if (def)
             {
-                return View(slikaList.ToPagedList(page ?? 1, 12));
+                def = false;
+                return View(slikaList.OrderByDescending(x => x.DatumObjave).ToPagedList(page ?? 1, 12));
             }
-            return View(slikaList.ToPagedList(page ?? 1, 5));
+            return View(slikaList.ToPagedList(page ?? 1, 12));
         }
 
         public ActionResult Video(string view, string search, string searchBy, int? page, string sortBy, string viewChange)
@@ -143,14 +140,15 @@ namespace PhotoShare.Controllers
                     break;
                 default:
                     videoList = videoList.OrderBy(x => x.ID).ToList().AsQueryable();
+                    def = true;
                     break;
-
             }
-            if (ViewBag.view == "grid")
+            if (def)
             {
-                return View(videoList.ToPagedList(page ?? 1, 12));
+                def = false;
+                return View(videoList.OrderByDescending(x => x.DatumObjave).ToPagedList(page ?? 1, 12));
             }
-            return View(videoList.ToPagedList(page ?? 1, 5));
+            return View(videoList.ToPagedList(page ?? 1, 12));
 
         }
     }

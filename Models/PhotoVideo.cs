@@ -17,7 +17,7 @@ namespace PhotoShare.Models
         [Display(Name = "Datoteka")]
         public string Path { get; set; }
         public bool isSlika { get; set; }
-        [NotMapped]
-        public HttpPostedFileBase PhotoVideoFile { get; set; }
+        //[NotMapped]
+        //public HttpPostedFileBase PhotoVideoFile { get; set; }
     }
 }
